@@ -42,6 +42,7 @@ export default ({
                 commit("SET_AUTHENTICATED", true)
                 commit("SET_USER", res.data)
             } catch (error) {
+                console.log(error)
                 commit("SET_AUTHENTICATED", false)
                 commit("SET_USER", null)
             }
