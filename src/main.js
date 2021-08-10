@@ -5,7 +5,7 @@ import store from './store'
 import axios from 'axios'
 
 axios.interceptors.request.use((config) => {
-    config.baseURL = "http://localhost:8000", //"https://cashinout-be.herokuapp.com",
+    config.baseURL = "https://cashinout-be.herokuapp.com", //"https://cashinout-be.herokuapp.com",
     config.withCredentials = true
     // config.headers = {
     //     'X-Requested-With': 'XMLHttpRequest',
