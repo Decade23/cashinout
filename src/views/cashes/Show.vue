@@ -49,7 +49,9 @@ export default {
 
     const getCash = async () => {
       try {
-        let { data } = await axios.get(`api/cash/${params.slug}`);
+        let { data } = await axios.get(`api/cash/${params.slug}`, {headers: {
+                Authorization: localStorage.getItem('plainToken')
+            }});
         cash.value = data.data;
       } catch (error) {
         router.replace('/cashes');

@@ -90,7 +90,11 @@
                       t.name
                     }}</span>
                   </span>
-                  <span :class="t.isCredit === true ? 'text-red-500' : 'text-green-500'">
+                  <span
+                    :class="
+                      t.isCredit === true ? 'text-red-500' : 'text-green-500'
+                    "
+                  >
                     Rp. {{ t.amount }},-
                   </span>
                 </router-link>
@@ -157,9 +161,10 @@
           </div>
           <div class="mb-3">
             <button
-                class="h-10 px-4 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-white">
-                Submit
-              </button>
+              class="h-10 px-4 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-white"
+            >
+              Submit
+            </button>
           </div>
         </form>
       </div>
@@ -189,6 +194,10 @@ export default {
           begin: form.begin,
           to: form.to,
         },
+            headers: {
+                Authorization: localStorage.getItem('plainToken')
+            }
+
       });
       state.value = data;
       form.begin = data.begin;
@@ -196,8 +205,10 @@ export default {
     };
 
     const add = async () => {
-        let r = await axios.post(`api/cash`, form)
-  
+        let r = await axios.post(`api/cash`, form, {headers: {
+                Authorization: localStorage.getItem('plainToken')
+            }})
+
         state.value.transactions.unshift(r.data.cash)
     }
 

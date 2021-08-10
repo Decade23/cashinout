@@ -59,6 +59,7 @@
 import { ref, computed } from "vue";
 
 import store from '@/store';
+import router from "@/router";
 export default {
   setup() {
     const className = "px-4 py-2";
@@ -68,7 +69,10 @@ export default {
     const user = computed(() => store.getters['auth/user'])
 
     const logout = async () => {
+    
       store.dispatch("auth/logout")
+      router.replace("/");
+      
       
     }
     return { className, isOn, authenticated, user, logout };

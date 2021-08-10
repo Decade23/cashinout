@@ -21,28 +21,45 @@ export default ({
     actions: {
         async login({ dispatch }, credentials) {
             try {
-                await axios.get('sanctum/csrf-cookie');
-                await axios.post('login', credentials);
-                dispatch('me')    
+                //await axios.get('sanctum/csrf-cookie');
+                const login = await axios.post('login', credentials);
+                localStorage.setItem('plainToken', login.data.token)
+                dispatch('me')
+
             } catch (e) {
-                console.log(e)
+                //console.log(e)
             }
-            
+
         },
 
-        async logout({ commit }) {
-            await axios.post('logout')
-            commit("SET_AUTHENTICATED", false)
-            commit("SET_USER", null)
+        async logout({commit, state}) {
+            try {
+                await axios.post('logout',{id: state.user.id})
+                //console.log(data)
+                
+                // remove token
+                localStorage.removeItem('plainToken')
+                
+                // set state management to false
+                commit("SET_AUTHENTICATED", false)
+                commit("SET_USER", null)
+            } catch (e) {
+                //console.log(e)
+            }
         },
 
         async me({ commit }) {
             try {
-                let res = await axios.get('api/me')
+                let res = await axios.get('api/me', {
+                    headers: {
+                        Authorization: localStorage.getItem('plainToken')
+                    }
+                })
+                //res.data.token = token
                 commit("SET_AUTHENTICATED", true)
                 commit("SET_USER", res.data)
             } catch (error) {
-                console.log(error)
+                //console.log(error)
                 commit("SET_AUTHENTICATED", false)
                 commit("SET_USER", null)
             }
