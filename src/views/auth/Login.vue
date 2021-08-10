@@ -17,7 +17,9 @@
                 placeholder="your email here..."
                 class="text-xs w-full border rounded-lg px-4 h-10 focus:outline-none focus:border-indigo-400"
               />
-              <div class="text-xs text-red-500 mt-2" v-if="errors['email']">{{ errors['email'][0] }}</div>
+              <div class="text-xs text-red-500 mt-2" v-if="errors['email']">
+                {{ errors["email"][0] }}
+              </div>
             </div>
 
             <div class="mb-5">
@@ -32,14 +34,21 @@
                 placeholder="your password here..."
                 class="text-xs w-full border rounded-lg px-4 h-10 focus:outline-none focus:border-indigo-400"
               />
-              <div class="text-xs text-red-500 mt-2" v-if="errors['password']">{{ errors['password'][0] }}</div>
+              <div class="text-xs text-red-500 mt-2" v-if="errors['password']">
+                {{ errors["password"][0] }}
+              </div>
             </div>
 
             <div class="mb-5">
               <button
                 class="h-10 px-4 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-white"
               >
-                Submit
+                <div v-if="loading" class="animate-pulse">
+                  Loading...
+                </div>
+                <div v-else>
+                  Submit
+                </div>
               </button>
             </div>
           </form>
@@ -55,22 +64,26 @@ import router from "@/router";
 import { reactive, ref } from "vue";
 export default {
   setup() {
-    const errors = ref([])
+    const errors = ref([]);
+    const loading = ref(false);
     const credential = reactive({
       email: "",
       password: "",
     });
 
     const login = async () => {
+      loading.value = true;
       try {
         await store.dispatch("auth/login", credential);
+        loading.value = false;
         router.replace("/");
       } catch (e) {
-          errors.value = e.response.data.errors
+        loading.value = true;
+        errors.value = e.response.data.errors;
       }
     };
 
-    return { login, credential, errors };
+    return { login, credential, errors, loading };
   },
 };
 </script>

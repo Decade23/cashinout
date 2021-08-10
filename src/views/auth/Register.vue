@@ -74,9 +74,15 @@
 
             <div class="mb-5">
               <button
+                :disabled="loading ? true : false"
                 class="h-10 px-4 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-white"
               >
-                Submit
+                <div v-if="loading" class="animate-pulse">
+                  Loading...
+                </div>
+                <div v-else>
+                  Submit
+                </div>
               </button>
             </div>
           </form>
@@ -93,7 +99,8 @@ import router from "@/router";
 import { reactive, ref } from "vue";
 export default {
   setup() {
-    const errors = ref([])
+    const errors = ref([]);
+    const loading = ref(false);
     const form = reactive({
       name: "",
       email: "",
@@ -102,16 +109,19 @@ export default {
     });
 
     const register = async () => {
+      loading.value = true;
       try {
         await axios.post("register", form);
         await store.dispatch("auth/me");
+        loading.value = false;
         router.replace("/");
       } catch (e) {
-          errors.value = e.response.data.errors
+        errors.value = e.response.data.errors;
+        loading.value = false;
       }
     };
 
-    return { register, form, errors };
+    return { register, form, errors, loading };
   },
 };
 </script>

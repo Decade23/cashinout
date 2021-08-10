@@ -115,9 +115,9 @@
               placeholder="name of transaction here..."
               class="text-xs w-full border rounded-lg px-4 h-10 focus:outline-none focus:border-indigo-400"
             />
-            <!-- <div class="text-xs text-red-500 mt-2" v-if="errors['email']">
-              {{ errors["email"][0] }}
-            </div> -->
+            <div class="text-xs text-red-500 mt-2" v-if="errors['name']">
+              {{ errors["name"][0] }}
+            </div>
           </div>
           <div class="mb-3">
             <input
@@ -128,9 +128,9 @@
               placeholder="when of transaction here..."
               class="text-xs w-full border rounded-lg px-4 h-10 focus:outline-none focus:border-indigo-400"
             />
-            <!-- <div class="text-xs text-red-500 mt-2" v-if="errors['when']">
-              {{ errors["when"][0] }}
-            </div> -->
+            <div class="text-xs text-gray-400 font-semibold">
+              *if empty. it will set today.
+            </div>
           </div>
 
           <div class="mb-3">
@@ -142,9 +142,13 @@
               placeholder="amount of transaction here..."
               class="text-xs w-full border rounded-lg px-4 h-10 focus:outline-none focus:border-indigo-400"
             />
-            <!-- <div class="text-xs text-red-500 mt-2" v-if="errors['amount']">
+            <div class="text-xs text-gray-400 font-semibold">
+              *add (<strong class="text-black">-</strong>) for cash out
+              transaction
+            </div>
+            <div class="text-xs text-red-500 mt-2" v-if="errors['amount']">
               {{ errors["amount"][0] }}
-            </div> -->
+            </div>
           </div>
 
           <div class="mb-3">
@@ -155,15 +159,21 @@
               placeholder="description of transaction here..."
               class="text-xs w-full border rounded-lg p-4 focus:outline-none focus:border-indigo-400"
             ></textarea>
-            <!-- <div class="text-xs text-red-500 mt-2" v-if="errors['email']">
-              {{ errors["email"][0] }}
-            </div> -->
+            <div class="text-xs text-red-500 mt-2" v-if="errors['description']">
+              {{ errors["description"][0] }}
+            </div>
           </div>
           <div class="mb-3">
             <button
               class="h-10 px-4 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-white"
+              :disabled="loading ? true : false"
             >
-              Submit
+              <div v-if="loading" class="animate-pulse">
+                Loading...
+              </div>
+              <div v-else>
+                Submit
+              </div>
             </button>
           </div>
         </form>
@@ -178,15 +188,18 @@ import { onMounted, reactive, ref } from "vue";
 export default {
   setup() {
     const state = ref([]);
+    const errors = ref([]);
     const form = reactive({
       begin: "",
       to: "",
 
-      name: '',
-      when: '',
-      amount: '',
-      description: ''
+      name: "",
+      when: "",
+      amount: "",
+      description: "",
     });
+
+    const loading = ref(false);
 
     const getCashes = async () => {
       let { data } = await axios.get("api/cash", {
@@ -194,10 +207,9 @@ export default {
           begin: form.begin,
           to: form.to,
         },
-            headers: {
-                Authorization: localStorage.getItem('plainToken')
-            }
-
+        headers: {
+          Authorization: localStorage.getItem("plainToken"),
+        },
       });
       state.value = data;
       form.begin = data.begin;
@@ -205,18 +217,31 @@ export default {
     };
 
     const add = async () => {
-        let r = await axios.post(`api/cash`, form, {headers: {
-                Authorization: localStorage.getItem('plainToken')
-            }})
+      loading.value = true;
+      
+      try {
+        let r = await axios.post(`api/cash`, form, {
+          headers: {
+            Authorization: localStorage.getItem("plainToken"),
+          },
+        });
 
-        state.value.transactions.unshift(r.data.cash)
-    }
+        state.value.transactions.unshift(r.data.cash);
+        loading.value = false;
+      } catch (e) {
+        //console.log(e);
+        errors.value = e.response.data.errors;
+        loading.value = false;
+      }
+
+      
+    };
 
     onMounted(() => {
       getCashes();
     });
 
-    return { state, form, getCashes, add };
+    return { state, form, getCashes, add, loading, errors };
   },
 };
 </script>
