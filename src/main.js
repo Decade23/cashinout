@@ -5,12 +5,12 @@ import store from './store'
 import axios from 'axios'
 
 axios.interceptors.request.use((config) => {
-    config.baseURL = "https://cashinout-be.herokuapp.com", //"http://localhost:8000",
+    config.baseURL = "http://localhost:8000", //"https://cashinout-be.herokuapp.com",
     config.withCredentials = true
-    config.headers = {
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-XSRF-TOKEN': 'XSRF-TOKEN'
-    }
+    // config.headers = {
+    //     'X-Requested-With': 'XMLHttpRequest',
+    //     'X-XSRF-TOKEN': 'XSRF-TOKEN'
+    // }
     return config
 })
 
